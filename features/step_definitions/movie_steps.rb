@@ -4,8 +4,10 @@ Given(/the following movies exist/) do |movies_table|
   movies_table.hashes.each do |movie|
     # each returned element will be a hash whose key is the table header.
     # you should arrange to add that movie to the database here.
+    mv = Movie.new(movie)
+    mv.save
   end
-  pending "Fill in this step in movie_steps.rb"
+  # pending "Fill in this step in movie_steps.rb"
 end
 
 Then(/(.*) seed movies should exist/) do |n_seeds|
@@ -18,7 +20,8 @@ end
 Then(/^I should see "(.*)" before "(.*)" in the movie list$/) do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
-  pending "Fill in this step in movie_steps.rb"
+  expect(page.body.index(e1)).to be < page.body.index(e2)
+  # pending "Fill in this step in movie_steps.rb"
 end
 
 
@@ -26,20 +29,39 @@ end
 #  "When I check only the following ratings: PG, G, R"
 
 When(/I check the following ratings: (.*)/) do |rating_list|
+  ["G", "PG", "R", "PG-13"].each do |rating|
+      uncheck(rating)
+  end
+
+  rating_list.split(", ").each do |rating|
+      check(rating)
+  end
+
+  click_button("Refresh")
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
-  pending "Fill in this step in movie_steps.rb"
+  # pending "Fill in this step in movie_steps.rb"
 end
 
 Then(/^I should (not )?see the following movies: (.*)$/) do |no, movie_list|
   # Take a look at web_steps.rb Then /^(?:|I )should see "([^"]*)"$/
-  pending "Fill in this step in movie_steps.rb"
+  movie_list.split(", ").each do |movie|
+    if no
+      expect(page).not_to have_content(movie)
+    else
+      expect(page).to have_content(movie)
+    end
+  end
+  # pending "Fill in this step in movie_steps.rb"
 end
 
 Then(/^I should see all the movies$/) do
   # Make sure that all the movies in the app are visible in the table
-  pending "Fill in this step in movie_steps.rb"
+  Movie.all.each do |movie|
+    expect(page).to have_content(movie.title)
+  end
+  # pending "Fill in this step in movie_steps.rb"
 end
 
 ### Utility Steps Just for this assignment.
